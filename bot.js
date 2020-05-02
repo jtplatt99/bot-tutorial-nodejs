@@ -1,11 +1,11 @@
 var HTTPS = require('https');
-const Client = require('pg');
+// const Client = require('pg');
 
-var botID = process.env.BOT_ID;
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: true,
-});
+// var botID = process.env.BOT_ID;
+// const client = new Client({
+  // connectionString: process.env.DATABASE_URL,
+  // ssl: true,
+// });
 
 function respond() {
   var request = JSON.parse(this.req.chunks[0]),
