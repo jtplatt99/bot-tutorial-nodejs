@@ -1,18 +1,23 @@
 var HTTPS = require('https');
-var cool = require('cool-ascii-faces');
+const Client = require('pg');
 
 var botID = process.env.BOT_ID;
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: true,
+});
 
 function respond() {
   var request = JSON.parse(this.req.chunks[0]),
-      botRegex = /^\d+$/;
+      botRegex = /^\d{1,3}$/;
 
   if(request.text && botRegex.test(request.text)) {
+    
     this.res.writeHead(200);
     postMessage(request);
     this.res.end();
   } else {
-    console.log("don't care");
+//    console.log("don't care");
     this.res.writeHead(200);
     this.res.end();
   }
@@ -21,7 +26,7 @@ function respond() {
 function postMessage(request) {
   var botResponse, options, body, botReq;
 
-  botResponse = request.name + ' said ' + request.text;
+  botResponse = request.sender_id + ' said ' + request.text;
 
   options = {
     hostname: 'api.groupme.com',
