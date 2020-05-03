@@ -1,14 +1,14 @@
 var HTTPS = require('https');
 var cool = require('cool-ascii-faces');
 var Client = require('pg');
+var moment = require('moment-timezone');
 
 var botID = process.env.BOT_ID;
 
 // Add database connection logic
-var sqlURL = process.env.DATABASE_URL;
 const client = new Client({
-  connectionString: sqlURL,
-  ssl: true,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {rejectUnauthorized: false},
 });
 
 function respond() {
@@ -22,15 +22,31 @@ function respond() {
   if(request.text && botRegex.test(request.text)) {
     
 	// This is where we add our additional logic
-	//console.log(JSON.stringify(request));
-	response = request.sender_id + ' said ' + request.text;
-	
+	//console.log(JSON.stringify(request));	
+	var time = moment(request.created_at).tz("UTC").tz("America/New_York")
+	var dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+	var day = dayOfWeek[time.days()-1];
+	if(day != 'Sunday') {
+	  if(time.hours() < 12) {
+		day += 'AM'
+	  } else {
+		day += 'PM'
+	  }
+	}
+
 	const client = new Client();
 	await client.connect();
-	const res = await client.query('SELECT NOW()');
-	console.log(res);
+	const res = await client.query('SELECT UserName from TurnipPrices WHERE UserID=' + request.sender_id + ';');
+	if(res.rows.length) { // Execute if this user exists
+	  const res = await client.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserID=' + request.sender_id + ';');
+	} else {
+	  const res = await client.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
+	    VALUES (' + request.sender_id + ', \'' + request.name + '\', ' + request.text + ');'
+	}
+	//console.log(res);
 	await client.end();
 	
+	response = request.sender_id + ' said ' + request.text;
 	// Actually send the message back to groupme
 	this.res.writeHead(200);
     postMessage(response);
