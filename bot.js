@@ -20,29 +20,28 @@ function respond() {
 
   // If matches format number 1
   if(request.text && botRegex.test(request.text)) {
-    
 	// This is where we add our additional logic
 	//console.log(JSON.stringify(request));	
-	var time = moment(request.created_at).tz("UTC").tz("America/New_York")
+	var time = moment(request.created_at).tz("UTC").tz("America/New_York");
 	var dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 	var day = dayOfWeek[time.days()-1];
 	if(day != 'Sunday') {
 	  if(time.hours() < 12) {
-		day += 'AM'
+		day += 'AM';
 	  } else {
-		day += 'PM'
+		day += 'PM';
 	  }
 	}
 
 	await client.connect();
-	const res = await client.query('SELECT UserName from TurnipPrices WHERE UserID=' + request.sender_id + ';');
-	if(res.rows.length) { // Execute if this user exists
-	  const res = await client.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserID=' + request.sender_id + ';');
-	} else {
-	  const res = await client.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
-	    VALUES (' + request.sender_id + ', \'' + request.name + '\', ' + request.text + ');'
+	var sqlres = await client.query('SELECT UserName from TurnipPrices WHERE UserID=' + request.sender_id + ';');
+	if(sqlres.rows.length) { // Execute if this user exists
+	  sqlres = await client.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserID=' + request.sender_id + ';');
+	} else {				// Create new row if user doesn't exist
+	  sqlres = await client.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
+	    VALUES (' + request.sender_id + ', \'' + request.name + '\', ' + request.text + ');';
 	}
-	//console.log(res);
+	//console.log(sqlres);
 	await client.end();
 	
 	response = request.sender_id + ' said ' + request.text;
