@@ -9,6 +9,7 @@ function respond() {
 
   if(request.text && botRegex.test(request.text)) {
     this.res.writeHead(200);
+	console.log(JSON.stringify(request));
     postMessage(request);
     this.res.end();
   } else {
