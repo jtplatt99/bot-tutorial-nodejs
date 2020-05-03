@@ -34,7 +34,6 @@ function respond() {
 	  }
 	}
 
-	const client = new Client();
 	await client.connect();
 	const res = await client.query('SELECT UserName from TurnipPrices WHERE UserID=' + request.sender_id + ';');
 	if(res.rows.length) { // Execute if this user exists
