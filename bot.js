@@ -2,6 +2,7 @@ var HTTPS = require('https');
 //var cool = require('cool-ascii-faces');
 const { Client } = require('pg');
 var moment = require('moment-timezone');
+var Predictor = require('./predictions.js');
 
 var botID = process.env.BOT_ID;
 
@@ -16,10 +17,12 @@ function respond() {
   var request = JSON.parse(this.req.chunks[0]);
   
   // Regular expressions matching
-  var botRegex = /^\d+$/;
+  var CaseOne = /^\d+$/;		// Case 1: Just a number from a user
+  var CaseTwo = /^\/TB max$/;
+  var CaseThree = /^\/TB links$/;
 
-  // If matches format number 1
-  if(request.text && botRegex.test(request.text)) {
+  // If we input a new value
+  if(request.text && CaseOne.test(request.text)) {
 	// This is where we add our additional logic
 	//console.log(JSON.stringify(request));	
 	var time = moment(request.created_at).tz("UTC").tz("America/New_York");
@@ -42,11 +45,57 @@ function respond() {
 	    client.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
 	      VALUES (' + request.sender_id + ', \'' + request.name + '\', ' + request.text + ');', (err, sqlres2) => {});
 	  }
-	//console.log(sqlres);
-	client.end();
+	  //console.log(sqlres);
+	  client.end();
 	});
 
-	response = request.sender_id + ' said ' + request.text;
+	this.res.writeHead(200);
+    this.res.end();
+  
+    // If we request the town with the max
+  } else if(request.text && CaseTwo.test(request.text)) {
+	var highestGuaranteedMinimum = ['',0];
+	var highestMaximum = ['',0];
+	
+	client.connect();
+	client.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
+
+	  for(let row of sqlres.rows) {
+	    var prices = deSQL(row);
+		var prediction = new predictor(prices,false);
+		var possibilities = prediction.analyze_possibilities();
+		possibilities = possibilities[0];
+		if(possibilities.weekGuaranteedMinimum > highestGuaranteedMinimum[1]) {
+		  highestGuaranteedMinimum = [row.UserName,possibilities.weekGuaranteedMinimum];
+		}
+		if(possibilities.weekMax > highestMaximum[1]) {
+		  highestMaximum = [row.UserName,possibilities.weekMax];
+		}
+	  }
+	  client.end();
+	});
+  
+  	var response = highestGuaranteedMinimum[0] + ' has the highest guaranteed minimum of ' + highestGuaranteedMinimum[1] + '\n' +
+			       highestMaximum[0] + ' has the highest overall maximum of ' + highestMaximum[1];
+	// Actually send the message back to groupme
+	this.res.writeHead(200);
+    postMessage(response);
+    this.res.end();
+	
+	// If we request links
+  } else if(request.text && CaseThree.test(request.text)) {
+	
+	var response = '';
+	
+	client.connect();
+	client.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
+	  for(let row of sqlres.rows) {
+	    var prices = deSQL(row);
+		response += row.UserName + ': https://turnipprophet.io/?prices=' + prices.join('.') + '\n';
+	  }
+	  client.end();
+	});
+	
 	// Actually send the message back to groupme
 	this.res.writeHead(200);
     postMessage(response);
@@ -95,5 +144,55 @@ function postMessage(response) {
   botReq.end(JSON.stringify(body));
 }
 
+function deSQL(row) {
+  var prices
+  for(var key of Object.keys(row)) {
+	switch(key) {
+	  case 'sunday':
+        prices[0] = row[key];
+		prices[1] = row[key];
+		break;
+	  case 'mondayam':
+	    prices[2] = row[key];
+		break;
+	  case 'mondaypm':
+	    prices[3] = row[key];
+		break;
+	  case 'tuesdayam':
+	    prices[4] = row[key];
+		break;
+	  case 'tuesdaypm':
+	    prices[5] = row[key];
+		break;
+	  case 'wednesdayam':
+	    prices[6] = row[key];
+		break;
+	  case 'wednesdaypm':
+	    prices[7] = row[key];
+		break;
+	  case 'thursdayam':
+	    prices[8] = row[key];
+		break;
+	  case 'thursdaypm':
+	    prices[9] = row[key];
+		break;
+	  case 'fridayam':
+	    prices[10] = row[key];
+		break;
+	  case 'fridaypm':
+	    prices[11] = row[key];
+		break;
+	  case 'saturdayam':
+	    prices[12] = row[key];
+		break;
+	  case 'saturdaypm':
+	    prices[13] = row[key];
+		break;
+	  default:
+	    break;
+	}
+  }
+  return prices;
+}
 
 exports.respond = respond;
