@@ -33,7 +33,7 @@ function respond() {
 	  }
 	}
 
-	await client.connect();
+	client.connect();
 	var sqlres = await client.query('SELECT UserName from TurnipPrices WHERE UserID=' + request.sender_id + ';');
 	if(sqlres.rows.length) { // Execute if this user exists
 	  sqlres = await client.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserID=' + request.sender_id + ';');
