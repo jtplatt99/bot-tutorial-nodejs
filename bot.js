@@ -73,7 +73,6 @@ function respond() {
 		}
 	  }
 	  client.end();
-	});
   
   	var response = highestGuaranteedMinimum[0] + ' has the highest guaranteed minimum of ' + highestGuaranteedMinimum[1] + '\n' +
 			       highestMaximum[0] + ' has the highest overall maximum of ' + highestMaximum[1];
@@ -81,6 +80,7 @@ function respond() {
 	this.res.writeHead(200);
     postMessage(response);
     this.res.end();
+	});
 	
 	// If we request links
   } else if(request.text && CaseThree.test(request.text)) {
@@ -89,18 +89,22 @@ function respond() {
 	
 	client.connect();
 	client.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
+	  if(err) {
+		console.log(err);
+		console.log(sqlres);
+	  }
 	  for(let row of sqlres.rows) {
 	    var prices = deSQL(row);
 		response += row.UserName + ': https://turnipprophet.io/?prices=' + prices.join('.') + '\n';
 	  }
 	  client.end();
-	});
 	
 	// Actually send the message back to groupme
 	this.res.writeHead(200);
     postMessage(response);
     this.res.end();
-  
+	});
+
   // Otherwise we don't need to respond
   } else {
     //console.log("don't care");
