@@ -1,5 +1,5 @@
 var HTTPS = require('https');
-var cool = require('cool-ascii-faces');
+//var cool = require('cool-ascii-faces');
 var Client = require('pg');
 var moment = require('moment-timezone');
 
