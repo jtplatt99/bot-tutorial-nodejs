@@ -13,7 +13,7 @@
     "pg": "^8.0.3"
   },
   "engines": {
-    "node": "0.10.x"
+    "node": "8.10.x"
   },
   "repository": {
     "type": "git",
