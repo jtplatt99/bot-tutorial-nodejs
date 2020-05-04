@@ -145,7 +145,7 @@ function postMessage(response) {
 }
 
 function deSQL(row) {
-  var prices
+  var prices = [];
   for(var key of Object.keys(row)) {
 	switch(key) {
 	  case 'sunday':
