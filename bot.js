@@ -34,16 +34,18 @@ function respond() {
 	}
 
 	client.connect();
-	var sqlres = await client.query('SELECT UserName from TurnipPrices WHERE UserID=' + request.sender_id + ';');
-	if(sqlres.rows.length) { // Execute if this user exists
-	  sqlres = await client.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserID=' + request.sender_id + ';');
-	} else {				// Create new row if user doesn't exist
-	  sqlres = await client.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
-	    VALUES (' + request.sender_id + ', \'' + request.name + '\', ' + request.text + ');';
-	}
-	//console.log(sqlres);
-	await client.end();
+	client.query('SELECT UserName from TurnipPrices WHERE UserID=' + request.sender_id + ';', (err, sqlres) => {
 	
+	  if(sqlres.rows.length) { // Execute if this user exists
+	    client.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserID=' + request.sender_id + ';', (err, sqlres2) => {});
+	  } else {				// Create new row if user doesn't exist
+	    client.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
+	      VALUES (' + request.sender_id + ', \'' + request.name + '\', ' + request.text + ');', (err, sqlres2) => {});
+	  }
+	//console.log(sqlres);
+	client.end();
+	});
+
 	response = request.sender_id + ' said ' + request.text;
 	// Actually send the message back to groupme
 	this.res.writeHead(200);
