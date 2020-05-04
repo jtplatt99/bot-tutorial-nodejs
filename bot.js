@@ -35,7 +35,8 @@ function respond() {
 
 	client.connect();
 	client.query('SELECT UserName FROM TurnipPrices WHERE UserID=' + request.sender_id + ';', (err, sqlres) => {
-	  if(sqlres.rows.length) { // Execute if this user exists
+	  console.log(sqlres.rows);
+	  if(!!sqlres.rows.length) { // Execute if this user exists
 	    client.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserID=' + request.sender_id + ';', (err, sqlres2) => {});
 	  } else {				// Create new row if user doesn't exist
 	    client.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
