@@ -24,7 +24,7 @@ function respond() {
 	//console.log(JSON.stringify(request));	
 	var time = moment(request.created_at).tz("UTC").tz("America/New_York");
 	var dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-	var day = dayOfWeek[time.days()-1];
+	var day = dayOfWeek[time.day()];
 	if(day != 'Sunday') {
 	  if(time.hours() < 12) {
 		day += 'AM';
