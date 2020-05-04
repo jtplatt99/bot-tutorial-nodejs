@@ -1,6 +1,6 @@
 var HTTPS = require('https');
 //var cool = require('cool-ascii-faces');
-var Client = require('pg');
+const { Client } = require('pg');
 var moment = require('moment-timezone');
 
 var botID = process.env.BOT_ID;
