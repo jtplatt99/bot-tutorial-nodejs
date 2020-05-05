@@ -71,13 +71,13 @@ function respond() {
 		  highestGuaranteedMinimum = [row.username,possibilities.weekGuaranteedMinimum,dayString[minDay]];
 		}
 		if(possibilities.weekMax > highestMaximum[1]) {
-		  var minDay = possibilities.prices.findIndex((element,index) => element.min == possibilities.weekMax && index >= day)
+		  var minDay = possibilities.prices.findIndex((element,index) => element.max == possibilities.weekMax && index >= day)
 		  highestMaximum = [row.username,possibilities.weekMax,dayString[minDay]];
 		}
 	  }
   
-  	  var response = highestGuaranteedMinimum[0] + ' has the highest guaranteed minimum of ' + highestGuaranteedMinimum[1] + ' as soon as' + highestGuaranteedMinimum[2] + '.\n' +
-			         highestMaximum[0] + ' has the highest overall maximum of ' + highestMaximum[1] + ' as soon as' + highestMaximum[2] + '.';
+  	  var response = highestGuaranteedMinimum[0] + ' has the highest guaranteed minimum of ' + highestGuaranteedMinimum[1] + ' as soon as ' + highestGuaranteedMinimum[2] + '.\n' +
+			         highestMaximum[0] + ' has the highest overall maximum of ' + highestMaximum[1] + ' as soon as ' + highestMaximum[2] + '.';
 	  // Actually send the message back to groupme
 	  this.res.writeHead(200);
       postMessage(response);
@@ -87,7 +87,7 @@ function respond() {
 	// If we request the link
   } else if(request.text && CaseThree.test(request.text)) {
 	  this.res.writeHead(200);
-      postMessage("http://turnip.jonathantplatt.com/");
+      postMessage("http://turnip.jonathantplatt.com/\nMay take > 10 seconds to load.");
       this.res.end();
 
 	// If we enter a price for a user
@@ -136,23 +136,25 @@ function respond() {
 		FridayAM=null, FridayPM=null, SaturdayAM=null, SaturdayPM=null;', (err, sqlres) => {});
 
 	this.res.writeHead(200);
-    this.res.end('All records, except for Sunday, reset');
+	postMessage('All records, except for Sunday, reset');
+    this.res.end();
 
 	// Reset all records
   } else if(request.text && CaseSix.test(request.text)) {
 	pool.query('DELETE FROM TurnipPrices', (err, sqlres) => {});
 
 	this.res.writeHead(200);
-    this.res.end('All records reset');
+	postMessage('All records reset');
+    this.res.end();
 
 	// Display help
   } else if(request.text && CaseHelp.test(request.text)) {
 	response = 'Turnip Bot records turnip prices you send into GroupMe! Simply enter your current price as an integer and it will be stored. Options include:\n\
-				XX - save turnip price XX\
-				XX II - save turnip price XX for user with initials II\
-				/tb help - show this help dialogArguments\
-				/tb max - responds with the user with highest prices\
-				/tb link - responds with link to current prices';
+XX - save turnip price XX\n\
+XX II - save turnip price XX for user with initials II\n\
+/tb help - show this help dialogArguments\n\
+/tb max - responds with the user with highest prices\n\
+/tb link - responds with link to current prices';
 
 	this.res.writeHead(200);
 	postMessage(response);
