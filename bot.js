@@ -26,7 +26,7 @@ function respond() {
   if(request.text && CaseOne.test(request.text)) {
 	// This is where we add our additional logic
 	//console.log(JSON.stringify(request));	
-	var time = moment(request.created_at).tz("UTC").tz("America/New_York");
+	var time = moment(request.created_at*1000).tz("UTC").tz("America/New_York");
 	var dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 	var day = dayOfWeek[time.day()];
 	if(day != 'Sunday') {
@@ -105,7 +105,7 @@ function respond() {
   } else if(request.text && CaseFour.test(request.text)) {
 	// This is where we add our additional logic
 	//console.log(JSON.stringify(request));	
-	var time = moment(request.created_at).tz("UTC").tz("America/New_York");
+	var time = moment(request.created_at*1000).tz("UTC").tz("America/New_York");
 	var dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 	var day = dayOfWeek[time.day()];
 	if(day != 'Sunday') {
@@ -251,8 +251,8 @@ function tabulator() {
 		else {
 		  response += '<th>' + possibilities.prices[i].min + '..' + possibilities.prices[i].max + '</th>';
 		}
-	    response += '<th>' + possibilities.weekGuaranteedMinimum + '</th><th>' + possibilities.weekMax + '</th>';
 	  }
+	  response += '<th>' + possibilities.weekGuaranteedMinimum + '</th><th>' + possibilities.weekMax + '</th>';
 	  response += '</tr>';
   }
   response += '</tbody></table></body></html>';
