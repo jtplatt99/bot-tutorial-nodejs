@@ -8,7 +8,7 @@ bot         = require('./bot.js');
 router = new director.http.Router({
   '/' : {
     post: bot.respond,
-    get: ping
+    get: bot.tabulator
   }
 });
 
@@ -26,10 +26,3 @@ server = http.createServer(function (req, res) {
 
 port = Number(process.env.PORT || 5000);
 server.listen(port);
-
-function ping() {
-  var response = bot.tabulator();
-  console.log(response);
-  this.res.writeHead(200);
-  this.res.end(response);
-}

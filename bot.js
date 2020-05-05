@@ -256,8 +256,9 @@ function tabulator() {
 	  response += '</tr>';
   }
   response += '</tbody></table></body></html>';
-  console.log(response);
-  return response;
+  
+  this.res.writeHead(200);
+  this.res.end(response);
   });
 }
 
