@@ -19,8 +19,10 @@ function respond() {
   // Regular expressions matching
   var CaseOne = /^\d+$/;			// Case 1: Just a number from a user
   var CaseTwo = /^\/tb max$/;		// Case 2: Request maximum prices
-  var CaseThree = /^\/tb links$/;	// Case 3: Request links for prices
+  var CaseThree = /^\/tb link$/;	// Case 3: Request links for prices
   var CaseFour = /^\d+ K$/;			// Case 4: Enter for Kim Kendra
+  var CaseFive = /^\/tb reset$/;	// Case 5: Reset
+  var CaseSix = /^\/tb reset all$/;	// Case 5: Reset all
 
   // If we input a new value
   if(request.text && CaseOne.test(request.text)) {
@@ -81,7 +83,7 @@ function respond() {
 	
 	// If we request links
   } else if(request.text && CaseThree.test(request.text)) {
-	
+	/* 
 	var response = '';
 	
 	pool.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
@@ -94,10 +96,10 @@ function respond() {
 	    var prices = deSQL(row);
 		response += row.username + ': https://turnipprophet.io/?prices=' + prices.slice(1).join('.') + '\n';
 	  }
-	
+	 */
 	  // Actually send the message back to groupme
 	  this.res.writeHead(200);
-      postMessage(response);
+      postMessage("http://turnip.jonathantplatt.com/");
       this.res.end();
 	});
 
@@ -125,6 +127,24 @@ function respond() {
 	      VALUES (934, \'Kim Kendra\', ' + request.text.match(/\d+/)[0] + ');', (err, sqlres2) => {});
 	  }
 	});
+
+	this.res.writeHead(200);
+    this.res.end();
+
+	// Reset records excluding sunday
+  } else if(request.text && CaseFive.test(request.text)) {
+	pool.query('UPDATE TurnipPrices SET MondayAM=null, MondayPM=null, TuesdayAM=null, TuesdayPM=null, \
+		WednesdayAM=null, WednesdayPM=null, ThursdayAM=null, ThursdayPM=null, \
+		FridayAM=null, FridayPM=null, SaturdayAM=null, SaturdayPM=null;', (err, sqlres) => {});
+
+	this.res.writeHead(200);
+    this.res.end();
+
+	// Reset all records
+  } else if(request.text && CaseSix.test(request.text)) {
+	pool.query('UPDATE TurnipPrices SET Sunday=null, MondayAM=null, MondayPM=null, TuesdayAM=null, TuesdayPM=null, \
+		WednesdayAM=null, WednesdayPM=null, ThursdayAM=null, ThursdayPM=null, \
+		FridayAM=null, FridayPM=null, SaturdayAM=null, SaturdayPM=null;', (err, sqlres) => {});
 
 	this.res.writeHead(200);
     this.res.end();
