@@ -29,5 +29,7 @@ server.listen(port);
 
 function ping() {
   this.res.writeHead(200);
-  this.res.end(bot.tabulator());
+  var response = bot.tabulator();
+  console.log(response);
+  this.res.end(reponse);
 }

@@ -20,7 +20,7 @@ function respond() {
   var CaseOne = /^\d+$/;			// Case 1: Just a number from a user
   var CaseTwo = /^\/tb max$/;		// Case 2: Request maximum prices
   var CaseThree = /^\/tb links$/;	// Case 3: Request links for prices
-  var CaseFour = /^d+ K$/;			// Case 4: Enter for Kim Kendra
+  var CaseFour = /^\d+ K$/;			// Case 4: Enter for Kim Kendra
 
   // If we input a new value
   if(request.text && CaseOne.test(request.text)) {
