@@ -19,9 +19,10 @@ function respond() {
   var CaseOne = /^\d+$/;			// Case 1: Just a number from a user
   var CaseTwo = /^\/tb max$/;		// Case 2: Request maximum prices
   var CaseThree = /^\/tb link$/;	// Case 3: Request links for prices
-  var CaseFour = /^\d+ K$/;			// Case 4: Enter for Kim Kendra
+  var CaseFour = /^\d+ \w{2}$/;		// Case 4: Enter for Kim Kendra
   var CaseFive = /^\/tb reset$/;	// Case 5: Reset
-  var CaseSix = /^\/tb reset all$/;	// Case 5: Reset all
+  var CaseSix = /^\/tb reset all$/;	// Case 6: Reset all
+  var CaseHelp = /^\/tb help$/;		// Case Help: Show help message
 
   // If we input a new value
   if(request.text && CaseOne.test(request.text)) {
@@ -38,13 +39,13 @@ function respond() {
 	}
 	console.log("It is " + day);
 
-	pool.query('SELECT UserName FROM TurnipPrices WHERE UserID=' + request.sender_id + ';', (err, sqlres) => {
+	pool.query('SELECT UserName FROM TurnipPrices WHERE UserName=\'' + request.name + '\';', (err, sqlres) => {
 	  console.log(sqlres.rows);
 	  if(!!sqlres.rows.length) { // Execute if this user exists
-	    pool.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserID=' + request.sender_id + ';', (err, sqlres2) => {});
+	    pool.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserName=' + request.name + ';', (err, sqlres2) => {});
 	  } else {				// Create new row if user doesn't exist
-	    pool.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
-	      VALUES (' + request.sender_id + ', \'' + request.name + '\', ' + request.text + ');', (err, sqlres2) => {});
+	    pool.query('INSERT INTO TurnipPrices (UserName, ' + day + ') \
+	      VALUES (\'' + request.name + '\', ' + request.text + ');', (err, sqlres2) => {});
 	  }
 	});
 
@@ -53,8 +54,12 @@ function respond() {
   
     // If we request the town with the max
   } else if(request.text && CaseTwo.test(request.text)) {
-	var highestGuaranteedMinimum = ['',0];
-	var highestMaximum = ['',0];
+	var day = moment(request.created_at*1000).tz("UTC").tz("America/New_York").day()*2;
+	if(time.hour() >= 12) {day += 1};
+	var dayString = ['Sunday','Sunday','MondayAM','MondayPM','TuesdayAM','TuesdayPM','WednesdayAM','WednesdayPM','ThursdayAM','ThursdayPM','FridayAM','FridayPM','SaturdayAM','SaturdayPM']
+	
+	var highestGuaranteedMinimum = ['',0,''];
+	var highestMaximum = ['',0,''];
 	
 	pool.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
 
@@ -63,15 +68,17 @@ function respond() {
 		var prediction = new Predictor(prices,false);
 		var possibilities = (prediction.analyze_possibilities())[0];
 		if(possibilities.weekGuaranteedMinimum > highestGuaranteedMinimum[1]) {
-		  highestGuaranteedMinimum = [row.username,possibilities.weekGuaranteedMinimum];
+		  var minDay = possibilities.prices.findIndex((element,index) => element.min == possibilities.weekGuaranteedMinimum && index >= day)
+		  highestGuaranteedMinimum = [row.username,possibilities.weekGuaranteedMinimum,dayString[minDay]];
 		}
 		if(possibilities.weekMax > highestMaximum[1]) {
-		  highestMaximum = [row.username,possibilities.weekMax];
+		  var minDay = possibilities.prices.findIndex((element,index) => element.min == possibilities.weekMax && index >= day)
+		  highestMaximum = [row.username,possibilities.weekMax,dayString[minDay]];
 		}
 	  }
   
-  	  var response = highestGuaranteedMinimum[0] + ' has the highest guaranteed minimum of ' + highestGuaranteedMinimum[1] + '.\n' +
-			         highestMaximum[0] + ' has the highest overall maximum of ' + highestMaximum[1] + '.';
+  	  var response = highestGuaranteedMinimum[0] + ' has the highest guaranteed minimum of ' + highestGuaranteedMinimum[1] + ' as soon as' + highestGuaranteedMinimum[2] + '.\n' +
+			         highestMaximum[0] + ' has the highest overall maximum of ' + highestMaximum[1] + ' as soon as' + highestMaximum[2] + '.';
 	  // Actually send the message back to groupme
 	  this.res.writeHead(200);
       postMessage(response);
@@ -84,9 +91,21 @@ function respond() {
       postMessage("http://turnip.jonathantplatt.com/");
       this.res.end();
 
-	// If we enter a price for Kim Kendra
+	// If we enter a price for a user
   } else if(request.text && CaseFour.test(request.text)) {
 	// This is where we add our additional logic
+	var price = (request.text.split(' '))[0];
+	var user = (request.text.split(' '))[1];
+	switch(user) {
+		case 'JP': user = 'Jonathan Platt'; break;
+		case 'CP': user = 'Chris Platt'; break;
+		case 'SP': user = 'Stephen Platt'; break;
+		case 'KP': user = 'Kim Platt'; break;
+		case 'KK': user = 'Kim Kendra'; break;
+		case 'DS': user = 'Danielle Stice'; break;
+		default: this.res.writeHead(200); this.res.end(); return;
+	}
+	
 	var time = moment(request.created_at*1000).tz("UTC").tz("America/New_York");
 	var dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 	var day = dayOfWeek[time.day()];
@@ -98,13 +117,13 @@ function respond() {
 	  }
 	}
 
-	pool.query('SELECT UserName FROM TurnipPrices WHERE UserName=\'Kim Kendra\';', (err, sqlres) => {
+	pool.query('SELECT UserName FROM TurnipPrices WHERE UserName=\'' + user + '\';', (err, sqlres) => {
 	  console.log(sqlres.rows);
 	  if(!!sqlres.rows.length) { // Execute if this user exists
-	    pool.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserName=\'Kim Kendra\';', (err, sqlres2) => {});
+	    pool.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserName=\'' + user + '\';', (err, sqlres2) => {});
 	  } else {				// Create new row if user doesn't exist
-	    pool.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
-	      VALUES (934, \'Kim Kendra\', ' + request.text.match(/\d+/)[0] + ');', (err, sqlres2) => {});
+	    pool.query('INSERT INTO TurnipPrices (UserName, ' + day + ') \
+	      VALUES (\'' + user + '\', ' + request.text.match(/\d+/)[0] + ');', (err, sqlres2) => {});
 	  }
 	});
 
@@ -122,12 +141,22 @@ function respond() {
 
 	// Reset all records
   } else if(request.text && CaseSix.test(request.text)) {
-	pool.query('UPDATE TurnipPrices SET Sunday=null, MondayAM=null, MondayPM=null, TuesdayAM=null, TuesdayPM=null, \
-		WednesdayAM=null, WednesdayPM=null, ThursdayAM=null, ThursdayPM=null, \
-		FridayAM=null, FridayPM=null, SaturdayAM=null, SaturdayPM=null;', (err, sqlres) => {});
+	pool.query('DELETE FROM TurnipPrices', (err, sqlres) => {});
 
 	this.res.writeHead(200);
     this.res.end('All records reset');
+
+	// Display help
+  } else if(request.text && CaseHelp.test(request.text)) {
+	response = 'Turnip Bot records turnip prices you send into GroupMe! Simply enter your current price as an integer and it will be stored. Options include:\n\
+				XX - save turnip price XX\
+				XX II - save turnip price XX for user with initials II\
+				/tb help - show this help dialogArguments\
+				/tb max - responds with the user with highest prices\
+				/tb link - responds with link to current prices';
+
+	this.res.writeHead(200);
+    this.res.end(response);
 
   // Otherwise we don't need to respond
   } else {
