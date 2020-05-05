@@ -81,27 +81,11 @@ function respond() {
       this.res.end();
 	});
 	
-	// If we request links
+	// If we request the link
   } else if(request.text && CaseThree.test(request.text)) {
-	/* 
-	var response = '';
-	
-	pool.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
-	  if(err) {
-		console.log(err);
-		console.log(sqlres);
-		console.log(process.env.DATABASE_URL);
-	  }
-	  for(let row of sqlres.rows) {
-	    var prices = deSQL(row);
-		response += row.username + ': https://turnipprophet.io/?prices=' + prices.slice(1).join('.') + '\n';
-	  }
-	 */
-	  // Actually send the message back to groupme
 	  this.res.writeHead(200);
       postMessage("http://turnip.jonathantplatt.com/");
       this.res.end();
-	});
 
 	// If we enter a price for Kim Kendra
   } else if(request.text && CaseFour.test(request.text)) {
