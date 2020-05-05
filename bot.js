@@ -37,10 +37,8 @@ function respond() {
 		day += 'PM';
 	  }
 	}
-	console.log("It is " + day);
 
 	pool.query('SELECT UserName FROM TurnipPrices WHERE UserName=\'' + request.name + '\';', (err, sqlres) => {
-	  console.log(sqlres.rows);
 	  if(!!sqlres.rows.length) { // Execute if this user exists
 	    pool.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserName=' + request.name + ';', (err, sqlres2) => {});
 	  } else {				// Create new row if user doesn't exist
@@ -54,7 +52,8 @@ function respond() {
   
     // If we request the town with the max
   } else if(request.text && CaseTwo.test(request.text)) {
-	var day = moment(request.created_at*1000).tz("UTC").tz("America/New_York").day()*2;
+	var time = moment(request.created_at*1000).tz("UTC").tz("America/New_York");
+	var day = time.day()*2;
 	if(time.hour() >= 12) {day += 1};
 	var dayString = ['Sunday','Sunday','MondayAM','MondayPM','TuesdayAM','TuesdayPM','WednesdayAM','WednesdayPM','ThursdayAM','ThursdayPM','FridayAM','FridayPM','SaturdayAM','SaturdayPM']
 	
@@ -103,7 +102,7 @@ function respond() {
 		case 'KP': user = 'Kim Platt'; break;
 		case 'KK': user = 'Kim Kendra'; break;
 		case 'DS': user = 'Danielle Stice'; break;
-		default: this.res.writeHead(200); this.res.end(); return;
+		default: this.res.writeHead(200); postMessage('Unknown initials: ' + user); this.res.end(); return;
 	}
 	
 	var time = moment(request.created_at*1000).tz("UTC").tz("America/New_York");
@@ -156,7 +155,8 @@ function respond() {
 				/tb link - responds with link to current prices';
 
 	this.res.writeHead(200);
-    this.res.end(response);
+	postMessage(response);
+    this.res.end();
 
   // Otherwise we don't need to respond
   } else {
