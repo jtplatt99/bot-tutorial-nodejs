@@ -16,13 +16,13 @@ function respond() {
   var request = JSON.parse(this.req.chunks[0]);
   
   // Regular expressions matching
-  var CaseOne = /^\d+$/;			// Case 1: Just a number from a user
-  var CaseTwo = /^\/tb max$/;		// Case 2: Request maximum prices
-  var CaseThree = /^\/tb link$/;	// Case 3: Request links for prices
-  var CaseFour = /^\d+ \w{2}$/;		// Case 4: Enter for Kim Kendra
-  var CaseFive = /^\/tb reset$/;	// Case 5: Reset
-  var CaseSix = /^\/tb reset all$/;	// Case 6: Reset all
-  var CaseHelp = /^\/tb help$/;		// Case Help: Show help message
+  var CaseOne = /^\d+$/i;			// Case 1: Just a number from a user
+  var CaseTwo = /^\/tb max$/i;		// Case 2: Request maximum prices
+  var CaseThree = /^\/tb link$/i;	// Case 3: Request links for prices
+  var CaseFour = /^\d+ \w{2}$/i;	// Case 4: Enter for Kim Kendra
+  var CaseFive = /^\/tb reset$/i;	// Case 5: Reset
+  var CaseSix = /^\/tb reset all$/i;// Case 6: Reset all
+  var CaseHelp = /^\/tb help$/i;	// Case Help: Show help message
 
   // If we input a new value
   if(request.text && CaseOne.test(request.text)) {
