@@ -29,7 +29,7 @@ function respond() {
 	var dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 	var day = dayOfWeek[time.day()];
 	if(day != 'Sunday') {
-	  if(time.hours() < 12) {
+	  if(time.hour() < 12) {
 		day += 'AM';
 	  } else {
 		day += 'PM';
@@ -62,7 +62,7 @@ function respond() {
 
 	  for(let row of sqlres.rows) {
 	    var prices = deSQL(row);
-		var prediction = new predictor(prices,false);
+		var prediction = new Predictor(prices,false);
 		var possibilities = prediction.analyze_possibilities();
 		possibilities = possibilities[0];
 		if(possibilities.weekGuaranteedMinimum > highestGuaranteedMinimum[1]) {
@@ -95,7 +95,7 @@ function respond() {
 	  }
 	  for(let row of sqlres.rows) {
 	    var prices = deSQL(row);
-		response += row.UserName + ': https://turnipprophet.io/?prices=' + prices.join('.') + '\n';
+		response += row.username + ': https://turnipprophet.io/?prices=' + prices.join('.') + '\n';
 	  }
 	  client.end();
 	
@@ -151,6 +151,9 @@ function postMessage(response) {
 function deSQL(row) {
   var prices = [];
   for(var key of Object.keys(row)) {
+	if(row[key] == null) {
+		continue;
+	}
 	switch(key) {
 	  case 'sunday':
         prices[0] = row[key];
