@@ -31,5 +31,5 @@ function ping() {
   this.res.writeHead(200);
   var response = bot.tabulator();
   console.log(response);
-  this.res.end(reponse);
+  this.res.end(response);
 }

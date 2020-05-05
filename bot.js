@@ -121,7 +121,7 @@ function respond() {
 	    pool.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserName=\'Kim Kendra\';', (err, sqlres2) => {});
 	  } else {				// Create new row if user doesn't exist
 	    pool.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
-	      VALUES (934, \'Kim Kendra\', ' + request.text + ');', (err, sqlres2) => {});
+	      VALUES (934, \'Kim Kendra\', ' + request.text.match(/\d+/)[0] + ');', (err, sqlres2) => {});
 	  }
 	});
 
