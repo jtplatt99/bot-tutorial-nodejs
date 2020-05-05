@@ -256,6 +256,7 @@ function tabulater() {
   }
   response += '</tbody></table></body></html>';
   return response;
+  }
 }
 
 exports.respond = respond;
