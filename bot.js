@@ -225,7 +225,7 @@ function deSQL(row) {
   return prices;
 }
 
-function tabulater() {
+function tabulator() {
   var response = '<!doctype html><html><body><table border="1"><thead><tr><th rowspan="2">User</th><th rowspan="2">Sunday</th><th colspan="2">Monday</th><th colspan="2">Tuesday</th><th colspan="2">Wednesday</th><th colspan="2">Thursday</th><th colspan="2">Friday</th><th colspan="2">Saturday</th><th rowspan="2">Guaranteed Min</th><th rowspan="2">Week Max</th></tr><tr><th>AM</th><th>PM</th><th>AM</th><th>PM</th><th>AM</th><th>PM</th><th>AM</th><th>PM</th><th>AM</th><th>PM</th><th>AM</th><th>PM</th></tr></thead><tbody>';
 
   pool.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
