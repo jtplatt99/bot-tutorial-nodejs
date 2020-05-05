@@ -92,6 +92,7 @@ function respond() {
 	  if(err) {
 		console.log(err);
 		console.log(sqlres);
+		console.log(process.env.DATABASE_URL);
 	  }
 	  for(let row of sqlres.rows) {
 	    var prices = deSQL(row);
