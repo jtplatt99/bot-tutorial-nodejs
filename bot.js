@@ -150,11 +150,11 @@ function respond() {
 	// Display help
   } else if(request.text && CaseHelp.test(request.text)) {
 	response = 'Turnip Bot records turnip prices you send into GroupMe! Simply enter your current price as an integer and it will be stored. Options include:\n\
-XX - save turnip price XX\n\
+XX - save turnip price XX for current time\n\
 XX II - save turnip price XX for user with initials II\n\
-/tb help - show this help dialogArguments\n\
-/tb max - responds with the user with highest prices\n\
-/tb link - responds with link to current prices';
+/tb help - show this help dialog\n\
+/tb max - show user with highest prices\n\
+/tb link - show link to current prices';
 
 	this.res.writeHead(200);
 	postMessage(response);
