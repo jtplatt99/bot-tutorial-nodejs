@@ -19,7 +19,7 @@ function respond() {
   var CaseOne = /^\d+$/i;			// Case 1: Just a number from a user
   var CaseTwo = /^\/tb max$/i;		// Case 2: Request maximum prices
   var CaseThree = /^\/tb link$/i;	// Case 3: Request links for prices
-  var CaseFour = /^\d+ \w{2}$/i;	// Case 4: Enter for Kim Kendra
+  var CaseFour = /^\d+ \w{2}$/i;	// Case 4: Enter for other users
   var CaseFive = /^\/tb reset$/i;	// Case 5: Reset
   var CaseSix = /^\/tb reset all$/i;// Case 6: Reset all
   var CaseHelp = /^\/tb help$/i;	// Case Help: Show help message
@@ -37,6 +37,8 @@ function respond() {
 		day += 'PM';
 	  }
 	}
+
+	console.log("Update " + day + " price to " + request.text + " requested from: " + request.name);
 
 	pool.query('SELECT UserName FROM TurnipPrices WHERE UserName=\'' + request.name + '\';', (err, sqlres) => {
 	  if(!!sqlres.rows.length) { // Execute if this user exists
@@ -86,7 +88,7 @@ function respond() {
 	// If we request the link
   } else if(request.text && CaseThree.test(request.text)) {
 	  this.res.writeHead(200);
-      postMessage("http://turnip.jonathantplatt.com/\nMay take > 10 seconds to load.");
+      postMessage("http://turnip.jonathantplatt.com/");
       this.res.end();
 
 	// If we enter a price for a user
@@ -114,6 +116,8 @@ function respond() {
 		day += 'PM';
 	  }
 	}
+
+	console.log("Update " + day + " price to " + request.text + " for " + user + " requested from: " + request.name);
 
 	pool.query('SELECT UserName FROM TurnipPrices WHERE UserName=\'' + user + '\';', (err, sqlres) => {
 	  console.log(sqlres.rows);
