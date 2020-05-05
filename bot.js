@@ -1,13 +1,13 @@
 var HTTPS = require('https');
 //var cool = require('cool-ascii-faces');
-const { Client } = require('pg');
+const { Pool } = require('pg');
 var moment = require('moment-timezone');
 var Predictor = require('./predictions.js');
 
 var botID = process.env.BOT_ID;
 
 // Add database connection logic
-const client = new Client({
+const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {rejectUnauthorized: false},
 });
@@ -36,17 +36,15 @@ function respond() {
 	  }
 	}
 
-	client.connect();
-	client.query('SELECT UserName FROM TurnipPrices WHERE UserID=' + request.sender_id + ';', (err, sqlres) => {
+	pool.query('SELECT UserName FROM TurnipPrices WHERE UserID=' + request.sender_id + ';', (err, sqlres) => {
 	  console.log(sqlres.rows);
 	  if(!!sqlres.rows.length) { // Execute if this user exists
-	    client.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserID=' + request.sender_id + ';', (err, sqlres2) => {});
+	    pool.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserID=' + request.sender_id + ';', (err, sqlres2) => {});
 	  } else {				// Create new row if user doesn't exist
-	    client.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
+	    pool.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
 	      VALUES (' + request.sender_id + ', \'' + request.name + '\', ' + request.text + ');', (err, sqlres2) => {});
 	  }
 	  //console.log(sqlres);
-	  client.end();
 	});
 
 	this.res.writeHead(200);
@@ -57,29 +55,26 @@ function respond() {
 	var highestGuaranteedMinimum = ['',0];
 	var highestMaximum = ['',0];
 	
-	client.connect();
-	client.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
+	pool.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
 
 	  for(let row of sqlres.rows) {
 	    var prices = deSQL(row);
 		var prediction = new Predictor(prices,false);
-		var possibilities = prediction.analyze_possibilities();
-		possibilities = possibilities[0];
+		var possibilities = (prediction.analyze_possibilities())[0];
 		if(possibilities.weekGuaranteedMinimum > highestGuaranteedMinimum[1]) {
-		  highestGuaranteedMinimum = [row.UserName,possibilities.weekGuaranteedMinimum];
+		  highestGuaranteedMinimum = [row.username,possibilities.weekGuaranteedMinimum];
 		}
 		if(possibilities.weekMax > highestMaximum[1]) {
-		  highestMaximum = [row.UserName,possibilities.weekMax];
+		  highestMaximum = [row.username,possibilities.weekMax];
 		}
 	  }
-	  client.end();
   
-  	var response = highestGuaranteedMinimum[0] + ' has the highest guaranteed minimum of ' + highestGuaranteedMinimum[1] + '\n' +
-			       highestMaximum[0] + ' has the highest overall maximum of ' + highestMaximum[1];
-	// Actually send the message back to groupme
-	this.res.writeHead(200);
-    postMessage(response);
-    this.res.end();
+  	  var response = highestGuaranteedMinimum[0] + ' has the highest guaranteed minimum of ' + highestGuaranteedMinimum[1] + '\n' +
+			         highestMaximum[0] + ' has the highest overall maximum of ' + highestMaximum[1];
+	  // Actually send the message back to groupme
+	  this.res.writeHead(200);
+      postMessage(response);
+      this.res.end();
 	});
 	
 	// If we request links
@@ -87,8 +82,7 @@ function respond() {
 	
 	var response = '';
 	
-	client.connect();
-	client.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
+	pool.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
 	  if(err) {
 		console.log(err);
 		console.log(sqlres);
@@ -98,12 +92,11 @@ function respond() {
 	    var prices = deSQL(row);
 		response += row.username + ': https://turnipprophet.io/?prices=' + prices.slice(1).join('.') + '\n';
 	  }
-	  client.end();
 	
-	// Actually send the message back to groupme
-	this.res.writeHead(200);
-    postMessage(response);
-    this.res.end();
+	  // Actually send the message back to groupme
+	  this.res.writeHead(200);
+      postMessage(response);
+      this.res.end();
 	});
 
   // Otherwise we don't need to respond
