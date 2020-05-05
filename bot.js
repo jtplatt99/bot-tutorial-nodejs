@@ -36,6 +36,7 @@ function respond() {
 		day += 'PM';
 	  }
 	}
+	console.log("It is " + day);
 
 	pool.query('SELECT UserName FROM TurnipPrices WHERE UserID=' + request.sender_id + ';', (err, sqlres) => {
 	  console.log(sqlres.rows);
@@ -255,6 +256,7 @@ function tabulator() {
 	  response += '</tr>';
   }
   response += '</tbody></table></body></html>';
+  console.log(response);
   return response;
   });
 }
