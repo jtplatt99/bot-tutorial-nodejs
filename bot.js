@@ -67,16 +67,15 @@ function respond() {
 		var prediction = new Predictor(prices,false);
 		var possibilities = (prediction.analyze_possibilities())[0];
 		if(possibilities.weekGuaranteedMinimum > highestGuaranteedMinimum[1]) {
-		  var minDay = possibilities.prices.findIndex((element,index) => element.min == possibilities.weekGuaranteedMinimum && index >= day)
-		  highestGuaranteedMinimum = [row.username,possibilities.weekGuaranteedMinimum,dayString[minDay]];
+		  highestGuaranteedMinimum = [row.username,possibilities.weekGuaranteedMinimum];
 		}
 		if(possibilities.weekMax > highestMaximum[1]) {
-		  var minDay = possibilities.prices.findIndex((element,index) => element.max == possibilities.weekMax && index >= day)
+		  var minDay = possibilities.prices.findIndex((element,index) => element.max == possibilities.weekMax && index >= day);
 		  highestMaximum = [row.username,possibilities.weekMax,dayString[minDay]];
 		}
 	  }
   
-  	  var response = highestGuaranteedMinimum[0] + ' has the highest guaranteed minimum of ' + highestGuaranteedMinimum[1] + ' as soon as ' + highestGuaranteedMinimum[2] + '.\n' +
+  	  var response = highestGuaranteedMinimum[0] + ' has the highest guaranteed minimum of ' + highestGuaranteedMinimum[1] + '.\n' +
 			         highestMaximum[0] + ' has the highest overall maximum of ' + highestMaximum[1] + ' as soon as ' + highestMaximum[2] + '.';
 	  // Actually send the message back to groupme
 	  this.res.writeHead(200);
