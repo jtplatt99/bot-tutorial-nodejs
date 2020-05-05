@@ -96,7 +96,7 @@ function respond() {
 	  }
 	  for(let row of sqlres.rows) {
 	    var prices = deSQL(row);
-		response += row.username + ': https://turnipprophet.io/?prices=' + prices.join('.') + '\n';
+		response += row.username + ': https://turnipprophet.io/?prices=' + prices.slice(1).join('.') + '\n';
 	  }
 	  client.end();
 	
