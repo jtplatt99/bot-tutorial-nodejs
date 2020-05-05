@@ -1,5 +1,4 @@
 var HTTPS = require('https');
-//var cool = require('cool-ascii-faces');
 const { Pool } = require('pg');
 var moment = require('moment-timezone');
 var Predictor = require('./predictions.js');
@@ -27,7 +26,6 @@ function respond() {
   // If we input a new value
   if(request.text && CaseOne.test(request.text)) {
 	// This is where we add our additional logic
-	//console.log(JSON.stringify(request));	
 	var time = moment(request.created_at*1000).tz("UTC").tz("America/New_York");
 	var dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 	var day = dayOfWeek[time.day()];
@@ -48,7 +46,6 @@ function respond() {
 	    pool.query('INSERT INTO TurnipPrices (UserID, UserName, ' + day + ') \
 	      VALUES (' + request.sender_id + ', \'' + request.name + '\', ' + request.text + ');', (err, sqlres2) => {});
 	  }
-	  //console.log(sqlres);
 	});
 
 	this.res.writeHead(200);
@@ -90,7 +87,6 @@ function respond() {
 	// If we enter a price for Kim Kendra
   } else if(request.text && CaseFour.test(request.text)) {
 	// This is where we add our additional logic
-	//console.log(JSON.stringify(request));	
 	var time = moment(request.created_at*1000).tz("UTC").tz("America/New_York");
 	var dayOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 	var day = dayOfWeek[time.day()];
@@ -122,7 +118,7 @@ function respond() {
 		FridayAM=null, FridayPM=null, SaturdayAM=null, SaturdayPM=null;', (err, sqlres) => {});
 
 	this.res.writeHead(200);
-    this.res.end();
+    this.res.end('All records, except for Sunday, reset');
 
 	// Reset all records
   } else if(request.text && CaseSix.test(request.text)) {
@@ -131,7 +127,7 @@ function respond() {
 		FridayAM=null, FridayPM=null, SaturdayAM=null, SaturdayPM=null;', (err, sqlres) => {});
 
 	this.res.writeHead(200);
-    this.res.end();
+    this.res.end('All records reset');
 
   // Otherwise we don't need to respond
   } else {
