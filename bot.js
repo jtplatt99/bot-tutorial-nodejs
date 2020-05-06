@@ -38,11 +38,11 @@ function respond() {
 	  }
 	}
 
-	console.log("Update " + day + " price to " + request.text + " requested from: " + request.name);
+	console.log("Update " + day + " price to " + request.text + " requested from " + request.name);
 
 	pool.query('SELECT UserName FROM TurnipPrices WHERE UserName=\'' + request.name + '\';', (err, sqlres) => {
 	  if(!!sqlres.rows.length) { // Execute if this user exists
-	    pool.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserName=' + request.name + ';', (err, sqlres2) => {});
+	    pool.query('UPDATE TurnipPrices SET ' + day + '=' + request.text + 'WHERE UserName=\'' + request.name + '\';', (err, sqlres2) => {});
 	  } else {				// Create new row if user doesn't exist
 	    pool.query('INSERT INTO TurnipPrices (UserName, ' + day + ') \
 	      VALUES (\'' + request.name + '\', ' + request.text + ');', (err, sqlres2) => {});
@@ -117,7 +117,7 @@ function respond() {
 	  }
 	}
 
-	console.log("Update " + day + " price to " + request.text + " for " + user + " requested from: " + request.name);
+	console.log("Update " + day + " price to " + request.text + " for " + user + " requested from " + request.name);
 
 	pool.query('SELECT UserName FROM TurnipPrices WHERE UserName=\'' + user + '\';', (err, sqlres) => {
 	  console.log(sqlres.rows);
