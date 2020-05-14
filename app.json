@@ -1,7 +1,7 @@
 {
-  "name": "Cool guy bot",
-  "description": "Basic Groupme Bot written in Node",
-  "repository": "https://github.com/petemcgrath/cool-guy-bot",
-  "logo": "http://www.tailgate365.com/wp-content/uploads/2011/06/tom-hanks-906.jpg",
+  "name": "Turnip Bot",
+  "description": "GroupMe Animal Crossing New Horizons turnip price bot written in Node",
+  "repository": "https://github.com/jtplatt99/bot-tutorial-nodejs",
+  "logo": "",
   "keywords": []
 }
