@@ -1,3 +1,8 @@
+var time = new Date(Date.now())
+if(time.getDay() != 0) {
+	return;
+}
+
 const { Pool } = require('pg');
 var Predictor = require('./predictions.js');
 
