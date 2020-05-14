@@ -276,8 +276,12 @@ function tabulator() {
 	  var prediction = new Predictor(prices,false);
 	  var possibilities = (prediction.analyze_possibilities())[0];
 	  
-	  response += '<th><a href="https://turnipprophet.io/?prices=' + prices.slice(1).join('.') + '">' +
-	              row.username + '</a></th>';
+	  response += '<th><a href="https://turnipprophet.io/?prices=' + prices.slice(1).join('.');
+	  if(row.pattern != null) {
+	    response += '&pattern=' + row.pattern;
+	  }
+	  response += '">' + row.username + '</a></th>';
+	  
 	  for(i = 1; i < 14; i++) {
 		if(prices[i] != null) {
 		  response += '<th>' + prices[i] + '</th>';
