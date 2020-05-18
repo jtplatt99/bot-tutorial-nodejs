@@ -26,7 +26,7 @@ pool.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
 	var possibilities = (prediction.analyze_possibilities())[1];
 	
 	if(possibilities.category_total_probability == 1) {
-		pool.query('UPDATE TurnipPrices SET Pattern=' + possibilities.pattern_number + 'WHERE UserName=\'' + row.name + '\';', (err, sqlres2) => {});
+		pool.query('UPDATE TurnipPrices SET Pattern=' + possibilities.pattern_number + 'WHERE UserName=\'' + row.username + '\';', (err, sqlres2) => {});
 	}
   }
 });
