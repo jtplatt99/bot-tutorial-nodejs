@@ -6,8 +6,6 @@ if(time.getDay() != 0) {
 const { Pool } = require('pg');
 var Predictor = require('./predictions.js');
 
-var botID = process.env.BOT_ID;
-
 // Add database connection logic
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -25,7 +23,7 @@ pool.query('SELECT * FROM TurnipPrices;', (err, sqlres) => {
 	var prediction = new Predictor(prices,false);
 	var possibilities = (prediction.analyze_possibilities())[1];
 	
-	if(possibilities.category_total_probability == 1) {
+	if(possibilities.category_total_probability.toFixed(10) == 1) {
 		pool.query('UPDATE TurnipPrices SET Pattern=' + possibilities.pattern_number + 'WHERE UserName=\'' + row.username + '\';', (err, sqlres2) => {});
 	}
   }
